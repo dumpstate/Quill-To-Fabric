@@ -1,6 +1,6 @@
 angular.module("quillToFabric", [])
-	.factory("QuillToFabric", function() {
-		var QuillToFabric = {}
+	.factory('QuillToFabric', function() {
+		var QuillToFabric = {};
 
 		QuillToFabric.defaultFontFamily = 'Arial';
 		QuillToFabric.defaultFontSize = 12;
@@ -73,31 +73,55 @@ angular.module("quillToFabric", [])
 			} else return 'black';
 		}
 
+		QuillToFabric.styles = function(ops) {
+			var line = 0, no = 0, styles = {};
+
+			_.each(ops, function(op) {
+				if(op.value) {
+					var item = styles[line];
+					if(item === undefined) item = {};
+
+					var prefs = {
+						fontFamily: QuillToFabric.fontFamily(op),
+						fontSize: QuillToFabric.fontSize(op),
+						fontStyle: QuillToFabric.fontStyle(op),
+						textDecoration: QuillToFabric.textDecoration(op),
+						fontWeight: QuillToFabric.fontWeight(op),
+						textBackgroundColor: QuillToFabric.textBackgroundColor(op),
+						fill: QuillToFabric.stroke(op)
+					};
+
+					_.each(op.value, function(c) {
+						if(c === '\n') {
+							no = 0;
+							line += 1;
+						} else {
+							item[no] = prefs;
+							no += 1;
+						}
+					});
+
+					styles[line] = item;
+
+				} else { line += 1; no = 0; }
+			});
+
+			return styles;
+		};
+
 		QuillToFabric.get = function(quill) {
 			if(typeof quill == 'string' || quill instanceof String)
 				quill = JSON.parse(quill);
 
-			return new fabric.Group(
-				_.reduce(quill.ops, function(memo, op) {
-					if(op.value) {
-						var text = new fabric.Text(op.value, {
-							left: memo.leftMargin,
-							fontFamily: QuillToFabric.fontFamily(op),
-							fontSize: QuillToFabric.fontSize(op),
-							fontStyle: QuillToFabric.fontStyle(op),
-							textDecoration: QuillToFabric.textDecoration(op),
-							fontWeight: QuillToFabric.fontWeight(op),
-							textBackgroundColor: QuillToFabric.textBackgroundColor(op),
-							fill: QuillToFabric.stroke(op)
-						});
-						memo.leftMargin += text.width;
-						memo.substrings.push(text);
-					}
-					return memo;
-				}, {
-					leftMargin: 0,
-					substrings: []
-				}).substrings);
+			var text = _.reduce(quill.ops, function(memo, op) {
+				return op.value ? memo + op.value : memo + '\n';
+			}, "");
+
+			return new fabric.IText(text, {
+				fontFamily: QuillToFabric.fontFamily(),
+				fontSize: QuillToFabric.fontSize(),
+				styles: QuillToFabric.styles(quill.ops)
+			});
 		}
 
 		return QuillToFabric;
