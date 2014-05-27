@@ -2,23 +2,23 @@ angular.module("quillToFabric", [])
 	.factory('QuillToFabric', function() {
 		var QuillToFabric = {};
 
-		QuillToFabric.defaultFontFamily = 'Arial';
-		QuillToFabric.defaultFontSize = 12;
+		var defaultFontFamily = 'Arial';
+		var defaultFontSize = 12;
 
-		QuillToFabric.fontSize = function(op) {
+		var fontSize = function(op) {
 			if(op && op.attributes && op.attributes.size &&
 				typeof op.attributes.size === 'string') {
 				return parseInt(op.attributes.size);
-			} else return QuillToFabric.defaultFontSize;
+			} else return defaultFontSize;
 		};
 
-		QuillToFabric.fontFamily = function(op) {
+		var fontFamily = function(op) {
 			if(op && op.attributes && op.attributes.font) {
 				return op.attributes.font;
-			} else return QuillToFabric.defaultFontFamily;
+			} else return defaultFontFamily;
 		};
 
-		QuillToFabric.fontStyle = function(op) {
+		var fontStyle = function(op) {
 			if(op && op.attributes) {
 				var styles = [];
 				if(op.attributes.italic === true)
@@ -35,7 +35,7 @@ angular.module("quillToFabric", [])
 			} else return 'normal';
 		};
 
-		QuillToFabric.textDecoration = function(op) {
+		var textDecoration = function(op) {
 			if(op && op.attributes) {
 				var decor = [];
 				if(op.attributes.underline === true)
@@ -55,72 +55,99 @@ angular.module("quillToFabric", [])
 			else return 'none';
 		};
 
-		QuillToFabric.fontWeight = function(op) {
+		var fontWeight = function(op) {
 			if(op && op.attributes && op.attributes.bold === true) {
 				return 'bold';
 			} else return 'normal';
 		};
 
-		QuillToFabric.textBackgroundColor = function(op) {
+		var textBackgroundColor = function(op) {
 			if(op && op.attributes && op.attributes.background) {
 				return op.attributes.background;
 			} else return 'transparent';
 		};
 
-		QuillToFabric.stroke = function(op) {
+		var stroke = function(op) {
 			if(op && op.attributes && op.attributes.color) {
 				return op.attributes.color;
 			} else return 'black';
-		}
+		};
 
-		QuillToFabric.styles = function(ops) {
-			var line = 0, no = 0, styles = {};
+		var getStyles = function(op) {
+			return {
+				fontFamily: fontFamily(op),
+				fontSize: fontSize(op),
+				fontStyle: fontStyle(op),
+				textDecoration: textDecoration(op),
+				fontWeight: fontWeight(op),
+				textBackgroundColor: textBackgroundColor(op),
+				fill: stroke(op)
+			};
+		};
+
+		var stylesAndText = function(ops) {
+			var row = 0, col = 0, text = "", styles = {};
 
 			_.each(ops, function(op) {
 				if(op.value) {
-					var item = styles[line];
+					text += op.value;
+
+					// check wheter styles object has been already
+					// created for given row
+					var item = styles[row];
 					if(item === undefined) item = {};
 
-					var prefs = {
-						fontFamily: QuillToFabric.fontFamily(op),
-						fontSize: QuillToFabric.fontSize(op),
-						fontStyle: QuillToFabric.fontStyle(op),
-						textDecoration: QuillToFabric.textDecoration(op),
-						fontWeight: QuillToFabric.fontWeight(op),
-						textBackgroundColor: QuillToFabric.textBackgroundColor(op),
-						fill: QuillToFabric.stroke(op)
-					};
+					// create styles object for a given 'op'
+					var prefs = getStyles(op);
 
-					_.each(op.value, function(c) {
+					// iterate over current string
+					for(var i = 0; i < op.value.length; i++) {
+						var c = op.value[i];						
 						if(c === '\n') {
-							no = 0;
-							line += 1;
+							// if the string contains new row character
+							// store current item into the styles object,
+							// increment row, reset object and column counter
+							styles[row] = item;
+							item = {};
+							col = 0; row += 1;
 						} else {
-							item[no] = prefs;
-							no += 1;
+							// for character different than new line char
+							// store preferences into appropriate column
+							// and increment the column
+							item[col++] = prefs;
 						}
-					});
+					}
 
-					styles[line] = item;
+					// store current item into styles object
+					styles[row] = item;
 
-				} else { line += 1; no = 0; }
+				} else {
+					text += '\n';
+					row += 1;
+					col = 0;
+				}
 			});
 
-			return styles;
+
+			// return together 'styles' and whole text trimmed
+			// such that it doesn't contain any unnecessary new lines
+			// at the end.
+			return {
+				'styles': styles,
+				'text': text.replace(/^\s+|\s+$/g, "")
+			};
 		};
 
 		QuillToFabric.get = function(quill) {
 			if(typeof quill == 'string' || quill instanceof String)
 				quill = JSON.parse(quill);
 
-			var text = _.reduce(quill.ops, function(memo, op) {
-				return op.value ? memo + op.value : memo + '\n';
-			}, "");
+			var st = stylesAndText(quill.ops);
 
-			return new fabric.IText(text, {
-				fontFamily: QuillToFabric.fontFamily(),
-				fontSize: QuillToFabric.fontSize(),
-				styles: QuillToFabric.styles(quill.ops)
+			return new fabric.IText(st.text, {
+				fontFamily: fontFamily(),
+				fontSize: fontSize(),
+				styles: st.styles
 			});
 		}
 
