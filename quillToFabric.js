@@ -86,11 +86,11 @@ angular.module("quillToFabric", [])
 		};
 
 		var stylesAndText = function(ops) {
-			var row = 0, col = 0, text = "", styles = {};
+			var row = 0, col = 0, text = [], styles = {};
 
 			_.each(ops, function(op) {
 				if(op.value) {
-					text += op.value;
+					text.push(op.value);
 
 					// check wheter styles object has been already
 					// created for given row
@@ -107,9 +107,9 @@ angular.module("quillToFabric", [])
 							// if the string contains new row character
 							// store current item into the styles object,
 							// increment row, reset object and column counter
-							styles[row] = item;
+							styles[row++] = item;
 							item = {};
-							col = 0; row += 1;
+							col = 0;
 						} else {
 							// for character different than new line char
 							// store preferences into appropriate column
@@ -122,7 +122,7 @@ angular.module("quillToFabric", [])
 					styles[row] = item;
 
 				} else {
-					text += '\n';
+					text.push('\n');
 					row += 1;
 					col = 0;
 				}
@@ -131,14 +131,18 @@ angular.module("quillToFabric", [])
 
 			// return together 'styles' and whole text trimmed
 			// such that it doesn't contain any unnecessary new lines
-			// at the end.
+			// at the end
 			return {
 				'styles': styles,
-				'text': text.replace(/^\s+|\s+$/g, "")
+				'text': text.join("").replace(/^\s+|\s+$/g, "")
 			};
 		};
 
-		QuillToFabric.get = function(quill) {
+		/**
+		 * Method that expects Quill delta and returns
+		 * fabric.IText object preserving content and formatting.
+		 */
+		QuillToFabric.getIText = function(quill) {
 			if(typeof quill == 'string' || quill instanceof String)
 				quill = JSON.parse(quill);
 
