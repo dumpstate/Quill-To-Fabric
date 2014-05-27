@@ -1,0 +1,10 @@
+{
+	"name": "quill-to-fabric",
+	"main": "quillToFabric.js",
+	"version": "0.1.0",
+	"dependencies": {
+		"angular": "1.2.6",
+		"underscore": "1.6.0",
+		"fabric": "1.4.0"
+	}
+}

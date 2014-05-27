@@ -27,11 +27,7 @@ angular.module("quillToFabric", [])
 					styles.push('oblique');
 				if(styles.length === 0)
 					return 'normal';
-				else 
-					return _.reduce(styles, function(memo, s) {
-						if(memo === "") return s;
-						else return memo += "|" + s;
-					}, "");
+				else return styles.join("|");
 			} else return 'normal';
 		};
 
@@ -46,11 +42,7 @@ angular.module("quillToFabric", [])
 					decor.push('overline');
 				if(decor.length === 0)
 					return 'none';
-				else 
-					return _.reduce(decor, function(memo, d) {
-						if(memo === "") return memo += d;
-						else return memo += "|" + d;
-					}, "");
+				else return decor.join("|");
 			}
 			else return 'none';
 		};

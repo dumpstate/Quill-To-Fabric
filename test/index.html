@@ -1,0 +1,67 @@
+<html ng-app="quillToFabricTest">
+<head>
+	<title>QuillJS to FabricJS</title>
+</head>
+<body>
+	<p>
+		<div id="quill-toolbar">
+          <select title="Font" class="sc-font">
+            <option value="Arial" selected>Arial</option>
+            <option value="Courier">Courier</option>
+            <option value="Times New Roman">Times New Roman</option>
+          </select>
+          <select title="Size" class="sc-size">
+            <option value="10px">10</option>
+            <option value="12px" selected>12</option>
+            <option value="15px">15</option>
+            <option value="18px">18</option>
+            <option value="20px">20</option>
+            <option value="22px">22</option>
+            <option value="24px">24</option>
+            <option value="26px">26</option>
+            <option value="36px">36</option>
+            <option value="48px">48</option>
+          </select>
+          <select title="Text Color" class="sc-color">
+            <option value="rgb(255, 255, 255)">White</option>
+            <option value="rgb(0, 0, 0)" selected>Black</option>
+            <option value="rgb(255, 0, 0)">Red</option>
+            <option value="rgb(0, 0, 255)">Blue</option>
+            <option value="rgb(0, 255, 0)">Lime</option>
+            <option value="rgb(0, 128, 128)">Teal</option>
+            <option value="rgb(255, 0, 255)">Magenta</option>
+            <option value="rgb(255, 255, 0)">Yellow</option>
+          </select>
+          <select title="Background Color" class="sc-background">
+            <option value="rgb(255, 255, 255)" selected>White</option>
+            <option value="rgb(0, 0, 0)">Black</option>
+            <option value="rgb(255, 0, 0)">Red</option>
+            <option value="rgb(0, 0, 255)">Blue</option>
+            <option value="rgb(0, 255, 0)">Lime</option>
+            <option value="rgb(0, 128, 128)">Teal</option>
+            <option value="rgb(255, 0, 255)">Magenta</option>
+            <option value="rgb(255, 255, 0)">Yellow</option>
+          </select>
+          <button title="Bold" class="sc-format-button sc-bold">Bold</button>
+          <button title="Italic" class="sc-format-button sc-italic">Italic</button>
+          <button title="Underline" class="sc-format-button sc-underline">Under</button>
+          <button title="Strikethrough" class="sc-format-button sc-strike">Strike</button>
+        </div>
+        <div id="quill-editor" style="border-style: solid; height: 300px; width: 800px;"></div>
+
+	</p>
+
+	<p>
+		<canvas id="fabric-itext" style="border-style: solid;"></canvas>
+	</p>
+
+	<script type="text/javascript" src="../bower_components/angular/angular.js"></script>
+	<script type="text/javascript" src="../bower_components/underscore/underscore.js"></script>
+	<script type="text/javascript" src="../bower_components/fabric/dist/all.min.js"></script>
+	<script type="text/javascript" src="../dist/quill.min.js"></script>
+
+	<script type="text/javascript" src="../quillToFabric.js"></script>
+
+	<script type="text/javascript" src="test.js"></script>
+</body>
+</html>
