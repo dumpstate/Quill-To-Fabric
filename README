@@ -1,0 +1,3 @@
+# README #
+
+Angular directive for transtating QuillJS deltas into FabricJS IText objects.
