@@ -1,4 +1,4 @@
-angular.module("quillToFabric", [])
+angular.module('quillToFabric', [])
 	.factory('QuillToFabric', function() {
 		var QuillToFabric = {};
 

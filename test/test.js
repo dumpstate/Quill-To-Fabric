@@ -1,26 +1,19 @@
 
 angular.module("quillToFabricTest", ['quillToFabric'])
-	.run(['QuillToFabric',
-			function(QuillToFabric) {
-		var editor = new Quill('#quill-editor');
-		editor.addModule('toolbar', {
-			container: '#quill-toolbar'
-		});
+	.run(['QuillToFabric', 'FabricToQuill',
+			function(QuillToFabric, FabricToQuill) {
+		var quillToFabricButton = document.getElementById('quillToFabricButton');
+		var fabricToQuillButton = document.getElementById('fabricToQuillButton');
 
-		var bigDelta = {};
-
-		editor.on('text-change', function(delta, source) {
-			if(bigDelta.compose) bigDelta = bigDelta.compose(delta);
-			else bigDelta = delta;
-
-			var group = fabricCanvas.item(0),
+		quillToFabricButton.onclick = function() {
+			var itext = fabricCanvas.item(0),
 				left, top, angle, scaleX, scaleY;
-			if(group) {
-				left = group.getLeft();
-				top = group.getTop();
-				angle = group.getAngle();
-				scaleX = group.getScaleX();
-				scaleY = group.getScaleY();
+			if(itext) {
+				left = itext.getLeft();
+				top = itext.getTop();
+				angle = itext.getAngle();
+				scaleX = itext.getScaleX();
+				scaleY = itext.getScaleY();
 			} else {
 				left = 0;
 				top = 0;
@@ -31,14 +24,34 @@ angular.module("quillToFabricTest", ['quillToFabric'])
 
 			fabricCanvas.clear();
 
-			group = QuillToFabric.getIText(bigDelta);
-			group.setLeft(left);
-			group.setTop(top);
-			group.setAngle(angle);
-			group.setScaleX(scaleX);
-			group.setScaleY(scaleY);
+			itext = QuillToFabric.getIText(bigDelta);
+			itext.setLeft(left);
+			itext.setTop(top);
+			itext.setAngle(angle);
+			itext.setScaleX(scaleX);
+			itext.setScaleY(scaleY);
 
-			fabricCanvas.add(group);
+			fabricCanvas.add(itext);
+		};
+
+		fabricToQuillButton.onclick = function() {
+			var itext = fabricCanvas.item(0);
+			if(itext) {
+				editor.updateContents(
+					FabricToQuill.getQuillDelta(itext));
+			} else console.log('Unable to acquire IText.');
+		};
+
+		var editor = new Quill('#quill-editor');
+		editor.addModule('toolbar', {
+			container: '#quill-toolbar'
+		});
+
+		var bigDelta = {};
+
+		editor.on('text-change', function(delta, source) {
+			if(bigDelta.compose) bigDelta = bigDelta.compose(delta);
+			else bigDelta = delta;
 		});
 
 		var fabricCanvas = new fabric.Canvas('fabric-itext');
