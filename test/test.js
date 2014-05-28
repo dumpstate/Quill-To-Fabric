@@ -1,5 +1,5 @@
 
-angular.module("quillToFabricTest", ['quillToFabric'])
+angular.module('quillToFabricTest', ['quillFabric'])
 	.run(['QuillToFabric', 'FabricToQuill',
 			function(QuillToFabric, FabricToQuill) {
 		var quillToFabricButton = document.getElementById('quillToFabricButton');

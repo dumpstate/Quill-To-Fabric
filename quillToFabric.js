@@ -1,21 +1,19 @@
-angular.module('quillToFabric', [])
-	.factory('QuillToFabric', function() {
+angular.module('quillFabric')
+	.factory('QuillToFabric', ['defaultStyles',
+			function(defaultStyles) {
 		var QuillToFabric = {};
-
-		var defaultFontFamily = 'Arial';
-		var defaultFontSize = 12;
 
 		var fontSize = function(op) {
 			if(op && op.attributes && op.attributes.size &&
 				typeof op.attributes.size === 'string') {
 				return parseInt(op.attributes.size);
-			} else return defaultFontSize;
+			} else return defaultStyles.fontSize;
 		};
 
 		var fontFamily = function(op) {
 			if(op && op.attributes && op.attributes.font) {
 				return op.attributes.font;
-			} else return defaultFontFamily;
+			} else return defaultStyles.fontFamily;
 		};
 
 		var fontStyle = function(op) {
@@ -148,4 +146,4 @@ angular.module('quillToFabric', [])
 		}
 
 		return QuillToFabric;
-	});
+	}]);
