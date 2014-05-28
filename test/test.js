@@ -37,7 +37,7 @@ angular.module('quillToFabricTest', ['quillFabric'])
 		fabricToQuillButton.onclick = function() {
 			var itext = fabricCanvas.item(0);
 			if(itext) {
-				editor.updateContents(
+				editor.setContents(
 					FabricToQuill.getQuillDelta(itext));
 			} else console.log('Unable to acquire IText.');
 		};

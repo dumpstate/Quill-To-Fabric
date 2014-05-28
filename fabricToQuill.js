@@ -3,14 +3,106 @@ angular.module('quillFabric')
 			function(defaultStyles) {
 		var FabricToQuill = {};
 
-		FabricToQuill.getQuillDelta = function(itext) {
-			console.log('getQuillDelta: ', itext);
-			if(itext && itext.text && itext.styles) {
-				var text = itext.text;
-				var delta = {};
-				_.each(itext.styles, function(line) {
-					//TODO
+		var fontSize = function(style) {
+			if(style && style.fontSize)
+				return style.fontSize + 'px';
+			else
+				return defaultStyles.fontSize + 'px';
+		};
+
+		var fontFamily = function(style) {
+			if(style && style.fontFamily) {
+				return style.fontFamily;
+			} else return defaultStyle.fontFamily;
+		};
+
+		var isItalic = function(style) {
+			if(style && style.fontStyle) {
+				return style.fontStyle.indexOf('italic') > -1;
+			} else return false;
+		};
+
+		var isBold = function(style) {
+			if(style && style.fontWeight) {
+				return style.fontWeight.indexOf('bold') > -1;
+			} else return false;
+		};
+
+		var isUnderline = function(style) {
+			if(style && style.textDecoration) {
+				return style.textDecoration.indexOf('underline') > -1;
+			} else return false;
+		};
+
+		var isStrike = function(style) {
+			if(style && style.textDecoration) {
+				return style.textDecoration.indexOf('line-through') > -1;
+			} else return false;
+		};
+
+		var trimStyles = function(itextStyles) {
+			var styles = [];
+
+			for(var lineNum in itextStyles) {
+				if(Object.keys(itextStyles[lineNum]).length > 0) {
+					styles.push({
+						'line': parseInt(lineNum),
+						'styles': itextStyles[lineNum]
+					});
+				}
+			}
+
+			return styles;
+		};
+
+		var trimText = function(itextText) {
+			return itextText.split('\n')
+				.filter(function(line) {
+					return line.length > 0;
 				});
+		};
+
+		var prepLines = function(itextStyles, itextText) {
+			var textLines = trimText(itextText),
+			    styles = trimStyles(itextStyles);
+			if(textLines.length === styles.length) {
+				for(var i = 0; i < styles.length; i++) {
+					styles[i].text = textLines[i];
+				}
+			}
+			return styles;
+		};
+
+		FabricToQuill.getQuillDelta = function(itext) {
+			if(itext && itext.text && itext.styles) {
+				var delta = [];
+
+				var previousLineNo = -1;
+				_.each(prepLines(itext.styles, itext.text), function(line) {
+					if(previousLineNo >= 0) {
+						delta.push({
+							'value': new Array(line.line - previousLineNo + 1).join('\n')
+						});
+					}
+					previousLineNo = line.line;
+					for(var i = 0; i < line.text.length; i++) {
+						var style = line.styles[i];
+						delta.push({
+							'value': line.text[i],
+							'attributes': {
+								'size': fontSize(style),
+								'font': fontFamily(style),
+								'italic': isItalic(style),
+								'bold': isBold(style),
+								'underline': isUnderline(style),
+								'strike': isStrike(style),
+								'color': style.fill,
+								'background': style.textBackgroundColor
+							}
+						});
+					}
+				});
+
 				return delta;
 			}
 		};
