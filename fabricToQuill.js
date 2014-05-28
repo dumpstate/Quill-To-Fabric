@@ -73,18 +73,35 @@ angular.module('quillFabric')
 			return styles;
 		};
 
+		/**
+		 * Method that expects fabric.IText object and returns
+		 * QuillJS delta object preserving content and formatting.
+		 */
 		FabricToQuill.getQuillDelta = function(itext) {
 			if(itext && itext.text && itext.styles) {
 				var delta = [];
 
 				var previousLineNo = -1;
+				// prepare the line objects first, and iterate
+				// over the lines
 				_.each(prepLines(itext.styles, itext.text), function(line) {
+					// the information about new lines is stored
+					// as a difference between current and the previous
+					// line.line property. So we're insering another
+					// delta object, containing only 'value' with
+					// new line character repeated appropriate number of times.
 					if(previousLineNo >= 0) {
 						delta.push({
 							'value': new Array(line.line - previousLineNo + 1).join('\n')
 						});
 					}
+
+					// update previous line
 					previousLineNo = line.line;
+
+					// iterating over characters given in line,
+					// for each character, appropiate delta object
+					// is being composed
 					for(var i = 0; i < line.text.length; i++) {
 						var style = line.styles[i];
 						delta.push({
